@@ -1,4 +1,4 @@
-module github.com/Jasmeet-1998/go-orientations
+module github.com/Jasmeet-1998/go-orientations/books-management-api
 
 go 1.16
 

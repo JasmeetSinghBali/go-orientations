@@ -25,3 +25,5 @@
              - models
              - routes
              - utils
+
+> NOTE- in golang we need to provide absolute paths relative path with reff to current dir or like so is not possible in go.
