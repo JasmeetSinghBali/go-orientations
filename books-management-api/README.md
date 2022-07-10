@@ -29,3 +29,11 @@
 > NOTE- in golang we need to provide absolute paths relative path with reff to current dir or like so is not possible in go.
 
 > NOTE- to make sense and process data in controllers we need to always unmarshal i.e deserialize i.e parse the json data coming in the request payload. ref: utils.go in utils under pkg folder
+
+            # navigate to cmd->main/main.go
+            go build
+
+            #resolve all errors if their are any
+
+            #finally
+            go run main.go
