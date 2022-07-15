@@ -159,4 +159,19 @@ NOTE- also its not possible to emit and receive the variable of channel in main 
 **ref(code): https://go.dev/src/sync/rwmutex.go**
 **ref(theory):https://pkg.go.dev/sync#RWMutex.Lock**
 
-> ## 7. Do it once only
+> ## 7. "Once" [from sync] i.e DO IT ONCE
+
+- object that perform action only once
+- Once is used by multiple sub go routines so that each go routine execute exactly 1 task and it makes sure if their task overlaps then exactly 1 subroutine does the task and in scenario more than 1 go routine complete that task to avoid wasting time.
+
+                  # A CASE STUDY
+                  # FIND GOOD MANGOES
+
+                  # a situation where multiple siblings go to market to find good quality mangoes
+
+
+                  #now each of these sibling act as a sub goroutine that are sent one after the another to find the mangoes
+
+                  #now we need to make sure if any sibling finds the mangoes then we stop sending any more siblings
+
+- to resolve the case where multiple siblings might find good mangoes instead whenever exactly 1 sibling found mangoe they infor all other sibling so the others can take chill pill.
