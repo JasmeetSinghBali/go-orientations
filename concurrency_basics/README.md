@@ -175,3 +175,19 @@ NOTE- also its not possible to emit and receive the variable of channel in main 
                   #now we need to make sure if any sibling finds the mangoes then we stop sending any more siblings
 
 - to resolve the case where multiple siblings might find good mangoes instead whenever exactly 1 sibling found mangoe they infor all other sibling so the others can take chill pill.
+
+> ## 8. Resource Pool [sync.Pool]
+
+- a pool is hoarding or accumalation of fixed number of things that can be used later
+- pool is used to limit the things/oprns/flows that are expensive i.e requires high resource values.
+
+                  # sync.Pool
+
+                  instance- like sub goroutine
+                  resources- method, variable, memory, storage etc...
+
+                  1. get()
+                  will check wheather their are available resources for a instance in the pool & returns i.e picks that resource and allocate to instance who made the call, if resource not available then it calls the New[func method] to create a new one.
+
+                  2. put()
+                  helps the instance to return the resource back to the pool once the instance is done doing their task
