@@ -202,3 +202,15 @@ NOTE- also its not possible to emit and receive the variable of channel in main 
   ref: https://man7.org/linux/man-pages/man2/futex.2.html
 
 > ## 10. Map safety and performance (sync.Map)
+
+ref: sync_Map.go
+
+- note overall syncMaps method and for loops are stable for stable keys in comparison to using regular maps with mutex.
+
+- syncMaps have better advantage performance wise when multiple concurrent go routines are performing oprns like store,load i.e get,put or get&put together in a loop.
+
+- for single calls or operations mutex and regular maps combo shud be enough
+
+> ## 11. Atomic (ATOMIC in sync)
+
+- Atomic provides low level memory primatives used for implementing
