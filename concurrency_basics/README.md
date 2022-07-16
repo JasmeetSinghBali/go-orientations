@@ -201,7 +201,7 @@ NOTE- also its not possible to emit and receive the variable of channel in main 
 - the lock and unlock of cond is based on the semaphore that is inspired from linux futex, where futex is used for blocking mech in kernel for shared-resources context.
   ref: https://man7.org/linux/man-pages/man2/futex.2.html
 
-> ## 10. Map safety and performance (sync.Map)
+> ## 10. Map safety and performance (sync.Map) NOTE_USE_WITH_CAUTION
 
 ref: sync_Map.go
 
@@ -211,6 +211,10 @@ ref: sync_Map.go
 
 - for single calls or operations mutex and regular maps combo shud be enough
 
-> ## 11. Atomic (ATOMIC in sync)
+> ## 11. 📝 Atomic (ATOMIC in sync) NOTE_USE_WITH_CAUTION
 
-- Atomic provides low level memory primatives used for implementing
+- Atomic provides low level memory primatives used for implementing synchronization atomic operations so that race condition can be avoided.
+
+- ref: Atomic.go
+
+- 📝Atomic methods i.e .Load & .Store are limited to certain data types, to counter this we have atomic.values
