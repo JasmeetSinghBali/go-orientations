@@ -200,3 +200,5 @@ NOTE- also its not possible to emit and receive the variable of channel in main 
 
 - the lock and unlock of cond is based on the semaphore that is inspired from linux futex, where futex is used for blocking mech in kernel for shared-resources context.
   ref: https://man7.org/linux/man-pages/man2/futex.2.html
+
+> ## 10. Map safety and performance (sync.Map)
