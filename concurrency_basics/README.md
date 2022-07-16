@@ -191,3 +191,12 @@ NOTE- also its not possible to emit and receive the variable of channel in main 
 
                   2. put()
                   helps the instance to return the resource back to the pool once the instance is done doing their task
+
+> ## 9. Signal & Broadcasting [synch.Cond]
+
+- Cond implements a condition variable , a trigger point for go routines waiting for or announcing the occurence of an event.
+
+- each Cond has an associated Locker L(a *Mutex or *RWMutex) which must be held when changing the condition and when calling the Wait method
+
+- the lock and unlock of cond is based on the semaphore that is inspired from linux futex, where futex is used for blocking mech in kernel for shared-resources context.
+  ref: https://man7.org/linux/man-pages/man2/futex.2.html
