@@ -3,6 +3,8 @@
                 cd go_blockchain_snippet
                 go mod init github.com/Jasmeet-1998/go-orientations/go_blockchain_snippet
 
+                go mod tidy
+
 1. Book
 
 - ID
@@ -35,11 +37,11 @@
 
 1.  struct Book
 2.  struct Block
-3.  struct BookBoughtTicket
+3.  struct BookTicket
 4.  struct Blockchain
 
         # functional flow
-        Book -> BookBoughtTicket ->Block -> Blockchain
+        Book -> BookTicket ->Block -> Blockchain
 
 > Blueprint/Walkthrough
 
