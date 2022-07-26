@@ -1,0 +1,46 @@
+> Simple golang implemented blockchain to keep bookstore transaction logs
+
+1. Book
+
+- ID
+- Title
+- Author
+- PublishDate
+- ISBN
+
+2. BookBoughtTicket [Information stored in the blockchain] i.e the DATA section of the block
+
+- User
+- DateOfBuy
+- IsGenesis (boolean)
+
+> NOTE- the first block in blockchain is genesis block and it does not have PrevHash field.
+
+> Block
+
+- reversed linked list
+
+        |---------------------------------------------|
+        | PrevHash| Position| DATA | TimeStamp| Hash| |
+        |---------------------------------------------|
+
+- PrevHash points to the hash of the block just before the current block
+- Hash is the sha256 based hash for the current blockchain that act as refference point for the subsequent block to have the PrevHash reff to this Hash field.
+- position is position of the block in the blockchain and Timestamp is when the block was created or updated.
+
+> 📝 Development
+
+1.  struct Book
+2.  struct Block
+3.  struct BookBoughtTicket
+4.  struct Blockchain
+
+        # functional flow
+        Book -> BookBoughtTicket ->Block -> Blockchain
+
+> Blueprint/Walkthrough
+
+1.  route /createNewBook
+
+        # to create new blockchain
+        New Blockchain --> Write Block --> Add Block --> Create Block-> check Genesis or not -> validate block-> generate hash-> validate hash
