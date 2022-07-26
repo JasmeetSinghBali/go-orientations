@@ -1,5 +1,8 @@
 > Simple golang implemented blockchain to keep bookstore transaction logs
 
+                cd go_blockchain_snippet
+                go mod init github.com/Jasmeet-1998/go-orientations/go_blockchain_snippet
+
 1. Book
 
 - ID
