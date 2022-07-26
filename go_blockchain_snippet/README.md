@@ -45,7 +45,27 @@
 
 > Blueprint/Walkthrough
 
-1.  route /createNewBook
-
         # to create new blockchain
         New Blockchain --> Write Block --> Add Block --> Create Block-> check Genesis or not -> validate block-> generate hash-> validate hash
+
+> run/test locally
+
+                    cd go_blockchain_snippet
+                    go run main.go
+
+                    # add new book
+                    # http://localhost:5000/new
+                    {
+                        "title":"Book1",
+                        "author":"Anonymous1",
+                        "isbn":"345678",
+                        "publish_date":"1909-05-07"
+                    }
+
+
+                    # copy the newly creted book id from response
+                    # and create new block -> http://localhost:5000 (POST)
+
+
+                    # get current blockchain
+                    http://localhost:5000 (GET)

@@ -66,7 +66,7 @@ func CreateBlock(prevBlock *Block, bookTicket BookTicket) *Block {
 	block := &Block{}
 	block.Pos = prevBlock.Pos + 1
 	block.PrevHash = prevBlock.Hash
-	block.Data = prevBlock.Data
+	block.Data = bookTicket
 	block.TimeStamp = time.Now().String()
 	block.generateHash()
 
@@ -127,6 +127,15 @@ func writeBlock(w http.ResponseWriter, r *http.Request) {
 	// pass the BookTicket now as data in the block to create new block
 	// and then add the block to the blockchain
 	blockchain.AddBlock(bookTicket)
+	resp, err := json.MarshalIndent(bookTicket, "", " ")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("could not marshal payload: %v", err)
+		w.Write([]byte("could not write block"))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 
 }
 
@@ -197,7 +206,7 @@ func main() {
 		for _, block := range blockchain.blocks {
 			fmt.Printf("Prev. hash: %x\n", block.PrevHash)
 			bytes, _ := json.MarshalIndent(block.Data, "", " ")
-			fmt.Printf("Data: %v\n", bytes)
+			fmt.Printf("Data: %v\n", string(bytes))
 			fmt.Printf("Hash: %x\n", block.Hash)
 			fmt.Println()
 		}
