@@ -28,4 +28,6 @@ func main() {
 	router.GET("/api_v0.0.2", func(c *gin.Context) {
 		c.JSON(200, gin.H{"success": "Welcome to api_v0.0.2!"})
 	})
+
+	router.Run(":" + port)
 }
