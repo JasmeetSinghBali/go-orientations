@@ -16,5 +16,8 @@
                         models [schema for DB storage]
                         routes [routing layer with all routes]
                         utils [misc helpers]
+                        middlewares [middlewares]
                         main.go [entry point]
                         go.mod [depend management]
+
+> IMP📝 context ref:https://pkg.go.dev/context
