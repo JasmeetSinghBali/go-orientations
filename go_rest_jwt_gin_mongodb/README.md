@@ -21,3 +21,5 @@
                         go.mod [depend management]
 
 > IMP📝 context ref:https://pkg.go.dev/context
+
+PART-4 timestamp

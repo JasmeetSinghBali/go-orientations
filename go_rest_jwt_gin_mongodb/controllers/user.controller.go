@@ -13,6 +13,9 @@ import(
 	"go_rest_jwt_gin_mongodb/models"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
@@ -61,6 +64,24 @@ func Signup() *gin.HandlerFunc {
 		if count > 0{
 			c.JSON(http.StatusInternalServerError,gin.H{"error": "this email or user already exists"})
 		}
+
+		// prepare payload to insert the new user record in DB
+		user.Created_At, _ = time.Parse(time.RFC3339,time.Now().Format(time.RFC3339))
+		user.Updated_At, _ = time.Parse(time.RFC3339,time.Now().Format(time.RFC3339))
+		user.ID = primitive.NewObjectID()
+		user.User_id = user.ID.Hex()
+		token, refreshToken, _ := utils.GenerateJWTTokens(*user.Email, *user.First_Name, *user.Last_Name, *user.User_Type, *&user.User_id)
+		user.Token = &token
+		user.Refresh_Token = &refreshToken 
+
+		const resultInsNumb, insertErr := userCollection.InsertOne(ctx, user)
+		if insertErr != nil{
+			msg := fmt.Sprintf("User item was not created")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		defer cancel()
+		c.JSON(http.StatusOK, resultInsNumb)
 	}
 }
 
@@ -88,10 +109,12 @@ func GetUser() gin.HandlerFunc{
 		// Decode to convert the json into primitive data structure so golang understands it
 		err := userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
 		defer cancel()
+		
 		if err != nil {
 			c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
 			return
 		}
+		
 		C.JSON(http.StatusOK,user)	
 	}	
 }
