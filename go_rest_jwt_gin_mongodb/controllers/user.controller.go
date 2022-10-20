@@ -21,8 +21,12 @@ import (
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
 var validate = validator.new()
 
-func HashPassword() {
-
+func HashPassword(password string) string {
+	bcrypt.GenerateFromPassword([]byte(password),14)
+	if err != nil{
+		log.Panic(err)
+	}
+	return string(bytes)
 }
 
 func VerifyPassword(userPassword string, providedPassword string) (bool, string){
@@ -59,6 +63,10 @@ func Signup() gin.HandlerFunc {
 			log.Panic(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while inspecting user email exists or not"})
 		}
+		
+		// store the hash version of the password
+		password := HashPassword(*user.Password)
+		user.Password = &password
 
 		//check for duplicate phone
 		count, err = userCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
@@ -113,11 +121,50 @@ func Login() gin.HandlerFunc {
 		// check user-password pair
 		passIsValid, msg := VerifyPassword(*user.password, *foundUser.password)
 		defer cancel()
+		if passwordIsValid != true{
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		// check email exist
+		if foundUser.Email === nil{
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "user not found"})
+		}
+		token, refreshToken, err := utils.GenerateJWTTokens(*foundUser.Email, *foundUser.First_Name, *foundUser.Last_Name, *foundUser.User_Type, *foundUser.User_ID)
+		utils.UpdateJWTTokens(token, refreshToken,foundUser.User._ID)
+		userCollection.findOne(ctx, bson.M{"user_id": foundUser.User_ID}).Decode(&foundUser)
+
+		if(err != nil){
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, foundUser)
 	}
 }
 
-func GetUsers() {
+func GetUsers() gin.HandlerFunc{
+	return func(c *gin.Context){
+		utils.InspectUserTypeToUid(c, "ADMIN"); err != nil{
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(),100*time.Second)
+		recordPerPage, err = strconv.Atoi(c.Query("recordPerPage"))
+		if err != nil || recordPerPage<1{
+			recordPerPage = 10
+		}
+		page, err1 := strconv.Atoi(c.Query("page"))
+		if err1 != nil || page<1{
+			page = 1
+		}
 
+		startIndex := (page - 1) * recordsPerPage
+		startIndex, err = strconv.Atoi(c.Query("startIndex"))
+
+		// Minimal Aggregators & Pipelines
+		matchStage := bson.D{{"$match", bson.D{{}}}}
+		groupStage := bson.D{{"$group",bson.D{{"_id", bson.D{{"id", "null"}}, {"total_count", bson.D{{"$sum", 1}} } }}}}
+
+	}
 }
 
 /*Get user by userID only for admin if userid differs from the current userId*/
