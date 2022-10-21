@@ -161,9 +161,42 @@ func GetUsers() gin.HandlerFunc{
 		startIndex, err = strconv.Atoi(c.Query("startIndex"))
 
 		// Minimal Aggregators & Pipelines
+		// match stage
 		matchStage := bson.D{{"$match", bson.D{{}}}}
-		groupStage := bson.D{{"$group",bson.D{{"_id", bson.D{{"id", "null"}}, {"total_count", bson.D{{"$sum", 1}} } }}}}
+		// group stage
+		// find count by grouping all the id's of the documents while "data", "$push","$$Root" will have the data also along with the count
+		groupStage := bson.D{
+			{"$group",bson.D{
+					{"_id", bson.D{{"id", "null"}}},
+					{"total_count", bson.D{{"$sum", 1}}},
+					{"data", bson.D{{"$push", "$$Root"}}}
+				}
+			}
+		}
+		// project stage, tells which data point shud be displayed i.e returned after the query
+		projectStage := bson.D{
+			{"$project", bson.D{
+				{"_id", 0},
+				{"total_count", 1},
+				{"user_items", bson.D{{ "$slice", []interface{}{"$data", startIndex, recordPerPage} }}},
+			}}
+		}
 
+		// call mongo build pipeline with match,group and project stage
+		result, err := userCollection.Aggregate(ctx, mongo.Pipeline{
+			matchStage,
+			groupStage,
+			projectStage
+		})
+		defer cancel()
+		if err!=nil {
+			c.JSON{http.StatusInternalServerError, gin.H{"error":"error occured while listing user items"}}
+		}
+		var allUsers []bson.M
+		if err = result.All(ctx,&allUsers); err != nil{
+			log.Fatal(err)
+		} 
+		c.JSON{http.StatusOK, allUsers[0]}
 	}
 }
 
