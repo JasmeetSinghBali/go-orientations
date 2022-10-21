@@ -3,10 +3,11 @@ package database
 import (
 	"context"
 	"fmt"
-	"go/mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -36,10 +37,10 @@ func DBInstance() *mongo.Client {
 	return dbConnection
 }
 
-var dbConnectInstance *mongo.client = DBInstance()
+var Client *mongo.Client = DBInstance()
 
 /*access a collection from DB via dbConnectInstance*/
-func OpenCollection(DBConnection *mongo.client, collectionName string) *mongo.Collection {
+func OpenCollection(DBConnection *mongo.Client, collectionName string) *mongo.Collection {
 	var collection *mongo.Collection = DBConnection.Database("cluster0").Collection(collectionName)
 	return collection
 }

@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strconv"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/Jasmeet-1998/go-orientations/go_rest_jwt_gin_mongodb/database"
+	"github.com/Jasmeet-1998/go-orientations/go_rest_jwt_gin_mongodb/models"
+	utils "github.com/Jasmeet-1998/go-orientations/go_rest_jwt_gin_mongodb/utils"
 	"github.com/gin-gonic/gin"
-	validator "github.com/go-playground/validator"
-	utils "go_rest_jwt_gin_mongodb/utils"
-	"go_rest_jwt_gin_mongodb/models"
-	database "go_rest_jwt_gin_mongodb/database"
+	"github.com/go-playground/validator"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,25 +20,25 @@ import (
 )
 
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
-var validate = validator.new()
+var validate = validator.New()
 
 func HashPassword(password string) string {
-	bcrypt.GenerateFromPassword([]byte(password),14)
-	if err != nil{
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
 		log.Panic(err)
 	}
 	return string(bytes)
 }
 
-func VerifyPassword(userPassword string, providedPassword string) (bool, string){
-	err := bcrypt.CompareHashAndPassword([]byte[providedPassword],[]byte[userPassword])
+func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
+	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
 	check := true
 	msg := ""
-	if(err!=nil){
+	if err != nil {
 		msg = fmt.Sprintf("email or password is incorrect")
 		check = false
 	}
-	return check,msg
+	return check, msg
 }
 
 func Signup() gin.HandlerFunc {
@@ -63,7 +64,7 @@ func Signup() gin.HandlerFunc {
 			log.Panic(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while inspecting user email exists or not"})
 		}
-		
+
 		// store the hash version of the password
 		password := HashPassword(*user.Password)
 		user.Password = &password
@@ -84,8 +85,8 @@ func Signup() gin.HandlerFunc {
 		user.Created_At, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.Updated_At, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.ID = primitive.NewObjectID()
-		user.User_id = user.ID.Hex()
-		token, refreshToken, _ := utils.GenerateJWTTokens(*user.Email, *user.First_Name, *user.Last_Name, *user.User_Type, *&user.User_id)
+		user.User_ID = user.ID.Hex()
+		token, refreshToken, _ := utils.GenerateJWTTokens(*user.Email, *user.First_Name, *user.Last_Name, *user.User_Type, *&user.User_ID)
 		user.Token = &token
 		user.Refresh_Token = &refreshToken
 
@@ -106,34 +107,34 @@ func Login() gin.HandlerFunc {
 		var user models.User
 		var foundUser models.User
 
-		if err := c.BindJSON(&user); err != nil{
+		if err := c.BindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		err := userCollection.FindOne(ctx,bson.M{"email": user.Email}).Decode(&foundUser)
+		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
 		defer cancel()
-		if err != nil{
-			c.JSON(http.StatusInternalServerError,gin.H{"error":"email or password is incorrect"})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "email or password is incorrect"})
 			return
 		}
 
 		// check user-password pair
-		passIsValid, msg := VerifyPassword(*user.password, *foundUser.password)
+		passwordIsValid, msg := VerifyPassword(*user.Password, *foundUser.Password)
 		defer cancel()
-		if passwordIsValid != true{
+		if passwordIsValid != true {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
 			return
 		}
 		// check email exist
-		if foundUser.Email === nil{
+		if foundUser.Email == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "user not found"})
 		}
-		token, refreshToken, err := utils.GenerateJWTTokens(*foundUser.Email, *foundUser.First_Name, *foundUser.Last_Name, *foundUser.User_Type, *foundUser.User_ID)
-		utils.UpdateJWTTokens(token, refreshToken,foundUser.User._ID)
-		userCollection.findOne(ctx, bson.M{"user_id": foundUser.User_ID}).Decode(&foundUser)
+		token, refreshToken, err := utils.GenerateJWTTokens(*foundUser.Email, *foundUser.First_Name, *foundUser.Last_Name, *foundUser.User_Type, foundUser.User_ID)
+		utils.UpdateJWTTokens(token, refreshToken, foundUser.User_ID)
+		userCollection.FindOne(ctx, bson.M{"user_id": foundUser.User_ID}).Decode(&foundUser)
 
-		if(err != nil){
+		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -141,23 +142,23 @@ func Login() gin.HandlerFunc {
 	}
 }
 
-func GetUsers() gin.HandlerFunc{
-	return func(c *gin.Context){
-		utils.InspectUserTypeToUid(c, "ADMIN"); err != nil{
+func GetUsers() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if err := utils.InspectUserTypeToUid(c, "ADMIN"); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		var ctx, cancel = context.WithTimeout(context.Background(),100*time.Second)
-		recordPerPage, err = strconv.Atoi(c.Query("recordPerPage"))
-		if err != nil || recordPerPage<1{
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		recordPerPage, err := strconv.Atoi(c.Query("recordPerPage"))
+		if err != nil || recordPerPage < 1 {
 			recordPerPage = 10
 		}
 		page, err1 := strconv.Atoi(c.Query("page"))
-		if err1 != nil || page<1{
+		if err1 != nil || page < 1 {
 			page = 1
 		}
 
-		startIndex := (page - 1) * recordsPerPage
+		startIndex := (page - 1) * recordPerPage
 		startIndex, err = strconv.Atoi(c.Query("startIndex"))
 
 		// Minimal Aggregators & Pipelines
@@ -166,37 +167,32 @@ func GetUsers() gin.HandlerFunc{
 		// group stage
 		// find count by grouping all the id's of the documents while "data", "$push","$$Root" will have the data also along with the count
 		groupStage := bson.D{
-			{"$group",bson.D{
-					{"_id", bson.D{{"id", "null"}}},
-					{"total_count", bson.D{{"$sum", 1}}},
-					{"data", bson.D{{"$push", "$$Root"}}}
-				}
-			}
-		}
+			{"$group", bson.D{
+				{"_id", bson.D{{"_id", "null"}}},
+				{"total_count", bson.D{{"$sum", 1}}},
+				{"data", bson.D{{"$push", "$$Root"}}}}}}
 		// project stage, tells which data point shud be displayed i.e returned after the query
 		projectStage := bson.D{
 			{"$project", bson.D{
 				{"_id", 0},
 				{"total_count", 1},
-				{"user_items", bson.D{{ "$slice", []interface{}{"$data", startIndex, recordPerPage} }}},
-			}}
-		}
+				{"user_items", bson.D{{"$slice", []interface{}{"$data", startIndex, recordPerPage}}}}}}}
 
 		// call mongo build pipeline with match,group and project stage
 		result, err := userCollection.Aggregate(ctx, mongo.Pipeline{
 			matchStage,
 			groupStage,
-			projectStage
+			projectStage,
 		})
 		defer cancel()
-		if err!=nil {
-			c.JSON{http.StatusInternalServerError, gin.H{"error":"error occured while listing user items"}}
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing user items"})
 		}
 		var allUsers []bson.M
-		if err = result.All(ctx,&allUsers); err != nil{
+		if err = result.All(ctx, &allUsers); err != nil {
 			log.Fatal(err)
-		} 
-		c.JSON{http.StatusOK, allUsers[0]}
+		}
+		c.JSON(http.StatusOK, allUsers[0])
 	}
 }
 

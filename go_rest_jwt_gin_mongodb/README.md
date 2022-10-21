@@ -12,7 +12,6 @@
 
                         # api_structure
                         controllers [buisness logic]
-                        repository [for DB interactions]
                         models [schema for DB storage]
                         routes [routing layer with all routes]
                         utils [misc helpers]
@@ -22,4 +21,9 @@
 
 > IMP📝 context ref:https://pkg.go.dev/context
 
-PART-4 timestamp
+> ### To get started
+
+                clone the repo
+                cd go_rest_jwt_***
+                go mod tidy [to resolve dependency]
+                go run main.go
