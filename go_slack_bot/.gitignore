@@ -1,3 +1,4 @@
 .env
 go_slack_bot.exe
 go.sum
+.weatherApiConfig

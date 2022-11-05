@@ -50,3 +50,6 @@ message.channels
                 #navigate to channel say general
                 #enter
                 @yourBotName ping
+
+- [signup](https://home.openweathermap.org/)
+- copy the apikey
