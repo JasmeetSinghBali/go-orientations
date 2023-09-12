@@ -5,6 +5,6 @@
 
 ---
 
-> 1. (composing-interfaces)[https://github.com/JasmeetSinghBali/Vizpercep-JSystems/gophershub/composinginterfaces]
+> 1. (composing-interfaces)[https://github.com/JasmeetSinghBali/go-orientations/tree/stable/gophershub/composinginterfaces]
 
 
