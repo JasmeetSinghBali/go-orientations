@@ -117,7 +117,7 @@ So the idea is that you make a slice of bytes and pass it to the Read method of 
 
 ```
 
-> 3. Generics v1.18 2022
+> 3. (Generics >= v1.18 released 2022)[https://github.com/JasmeetSinghBali/go-orientations/tree/stable/gophershub/generics_1.18_2022]
 
 - the aim of generics is to write generic function for repeatable logic based code by specifying generic type during function defination powered by custom types
 
