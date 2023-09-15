@@ -30,6 +30,12 @@ type User[T CustomData] struct {
 	Data T // this data cud be anything
 }
 
+// 💫 a generic map
+// here the key can be generic or maybe value
+// NOTE- The valid key for a map can only have comparable types
+// example a(int) == b(int) , a(string) == b(string), *a == *b i.e any value that can be compared with the same value of its type
+type CustomMap[T comparable, V int | string] map[T]V
+
 func main() {
 	resultInt := MapItOver([]int{1, 2, 3}, func(n int) int {
 		return n * 7
@@ -53,4 +59,13 @@ func main() {
 	}
 	fmt.Println(userWithString)
 
+	mapWithIntKey := make(CustomMap[int, string])
+	mapWithIntKey[3] = "yo"
+	fmt.Println(mapWithIntKey)
+	mapWithStringKey := make(CustomMap[string, int])
+	mapWithStringKey["yo"] = 3
+	fmt.Println(mapWithStringKey)
+	mapWithStringKeyValue := make(CustomMap[string, string])
+	mapWithStringKeyValue["yo"] = "yo"
+	fmt.Println(mapWithStringKeyValue)
 }
