@@ -19,6 +19,17 @@ func MapItOver[T constraints.Ordered](val []T, processFunc func(T) T) []T {
 	return newValues
 }
 
+type CustomData interface {
+	constraints.Ordered | []byte | []rune
+}
+
+// 💫 a generic struct
+type User[T CustomData] struct {
+	ID   int
+	Name string
+	Data T // this data cud be anything
+}
+
 func main() {
 	resultInt := MapItOver([]int{1, 2, 3}, func(n int) int {
 		return n * 7
@@ -28,4 +39,18 @@ func main() {
 		return n * 7
 	})
 	fmt.Println(resultFloat)
+
+	userWithInt := User[int]{
+		ID:   1,
+		Name: "JohnDoe",
+		Data: 3,
+	}
+	fmt.Println(userWithInt)
+	userWithString := User[string]{
+		ID:   1,
+		Name: "JohnDoe",
+		Data: "somerandomfacts!",
+	}
+	fmt.Println(userWithString)
+
 }
