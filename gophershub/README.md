@@ -8,7 +8,7 @@
 > 1. (composing-interfaces)[https://github.com/JasmeetSinghBali/go-orientations/tree/stable/gophershub/composinginterfaces]
 
 
-> 2. (when&how-to-use-pointers)[]
+> 2. (when&how-to-use-pointers)[https://github.com/JasmeetSinghBali/go-orientations/tree/stable/gophershub/effectiveuseofpointers]
 
 ```
 reff: https://go101.org/article/pointer.html 
@@ -115,4 +115,50 @@ So the idea is that you make a slice of bytes and pass it to the Read method of 
 3. DONT GUESS , USE THE TOOLING !!!
 
 
+```
+
+> 3. Generics v1.18 2022
+
+- the aim of generics is to write generic function for repeatable logic based code by specifying generic type during function defination powered by custom types
+
+```
+package main
+
+import "fmt"
+
+// 🎈 duplicate version of the same logic of adding
+func AddInt(a int, b int) int {
+	return a + b
+}
+func AddFloat(a float64, b float64) float64 {
+	return a + b
+}
+
+// 🎈
+
+// 💫
+// ~ helps to use any type associated to the underlyi9ng type CustomNum when calling AddGeneric
+type NumberID int
+type CustomNum interface {
+	~int | ~float64
+}
+
+// 💫 generic function comes to the rescue
+// with custom generic type defined  in square brackets [] & then used
+func AddGeneric[T CustomNum](a T, b T) T {
+	return a + b
+}
+
+func main() {
+	result := AddInt(1, 2)
+	result2 := AddFloat(1.1, 2.2)
+	a := NumberID(7)
+	b := NumberID(6)
+	resultGeneric := AddGeneric(3.4, 2)
+	resultAliasType := AddGeneric(a, b)
+	fmt.Println(result)
+	fmt.Println(result2)
+	fmt.Println(resultGeneric)
+	fmt.Println(resultAliasType)
+}
 ```
